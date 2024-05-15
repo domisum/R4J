@@ -106,6 +106,8 @@ public class BurstRateLimiter extends RateLimiter
 					long newDelay = firstCallInTime.get(limit).get() + limit.getTimeframeInMS() - now.toEpochMilli();
 					if(newDelay > delay[0])
 					{
+						logger.info("Calls made in the time frame: {}", actual);
+						logger.info("Limit for the time frame: {}", limit.getPermits());
 						delay[0] = newDelay;
 					}
 				}

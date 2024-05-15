@@ -36,11 +36,12 @@ public class BurstRateLimiter extends RateLimiter
 		{
 			update();
 			long sleepTime = getDelay();
+			if(sleepTime > 0)
+				sleepTime = 100;
 			
 			if(sleepTime != 0)
 			{
 				Duration dur = Duration.of(sleepTime, ChronoUnit.MILLIS);
-				
 				logger.info("Ratelimited activated! Sleeping for: {}", dur);
 			}
 			

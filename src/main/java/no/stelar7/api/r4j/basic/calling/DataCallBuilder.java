@@ -203,7 +203,7 @@ public class DataCallBuilder
 				}
 				else
 				{
-					logger.info("{}429 ratelimit hit! ", response.getResponseData());
+					logger.info("429 rate limit hit! {}", response.getResponseData());
 				}
 				
 				return this.build();
@@ -634,10 +634,14 @@ public class DataCallBuilder
 				StringBuilder valueList = new StringBuilder();
 				DataCall.getLimiter().get(dc.getPlatform()).forEach((key, value) ->
 				{
-					valueList.append(key);
-					valueList.append("=");
-					valueList.append(value.getCallCountInTime());
-					valueList.append("\n");
+					if(value.getCallCountInTime().entrySet().stream()
+						.anyMatch(e -> e.getValue().get() > e.getKey().getPermits()))
+					{
+						valueList.append(key);
+						valueList.append("=");
+						valueList.append(value.getCallCountInTime());
+						valueList.append(" ");
+					}
 				});
 				
 				String reasonString = String.format("%s%n%s", limitType.getReason(), valueList.toString().trim());

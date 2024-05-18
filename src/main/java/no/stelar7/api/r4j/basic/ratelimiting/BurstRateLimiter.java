@@ -99,6 +99,9 @@ public class BurstRateLimiter extends RateLimiter
 			}
 		}
 		
+		if(delay > 10 * 1000)
+			delay = 10 * 1000;
+		
 		return delay;
 	}
 	

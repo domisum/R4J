@@ -67,7 +67,7 @@ public class BurstRateLimiter extends RateLimiter
 		var now = Instant.now();
 		
 		if(overloadTimer > 0)
-			logger.info("Overload timer set to {}", overloadTimer);
+			logger.warn("Overload timer set to {}s", overloadTimer);
 		long delay = overloadTimer * 1000L;
 		overloadTimer = 0;
 		

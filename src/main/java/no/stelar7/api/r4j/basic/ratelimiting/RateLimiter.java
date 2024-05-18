@@ -97,8 +97,6 @@ public abstract class RateLimiter
 		try
 		{
 			overloadTimer = Integer.parseInt(sleep);
-			logger.info("Forcing next sleep to be at least: {} seconds", overloadTimer);
-			
 		}
 		catch(NumberFormatException e)
 		{

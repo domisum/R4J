@@ -57,7 +57,7 @@ public class BurstRateLimiter extends RateLimiter
 					if(oldVal + 1 < newVal)
 					{
 						callCountInTime.get(rateLimit).set(newVal);
-						logger.debug("limit {} has changed from {} to {}", entry, oldVal, newVal);
+						logger.info("Limit {} has changed from {} to {}", entry, oldVal, newVal);
 					}
 				}
 	}
@@ -83,7 +83,10 @@ public class BurstRateLimiter extends RateLimiter
 				firstCall.set(nextIntervalStart);
 				callCount.set(0);
 			}
-			if(untilNextInterval > 0 && callCount.get() >= limit.getPermits())
+			
+			int permits = limit.getPermits();
+			permits = (int) Math.floor(permits * 0.95);
+			if(untilNextInterval > 0 && callCount.get() >= permits)
 			{
 				long newDelay = untilNextInterval + 500;
 				

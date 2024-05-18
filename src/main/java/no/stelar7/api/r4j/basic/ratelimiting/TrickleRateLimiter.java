@@ -72,13 +72,13 @@ public class TrickleRateLimiter extends RateLimiter
 				rateLimit.getPermits() / 2d);
 		}
 		
-		public long getDelayMs()
+		public synchronized long getDelayMs()
 		{
-			long now = System.currentTimeMillis();
-			long since = now - balanceTime;
+			long nowMs = System.currentTimeMillis();
+			long sinceMs = nowMs - balanceTime;
 			
-			balanceTime = now;
-			balance += since / 1000d * perSecond;
+			balanceTime = nowMs;
+			balance += sinceMs / 1000d * perSecond;
 			balance = Math.min(balance, maxAccumulation);
 			
 			balance -= 1;

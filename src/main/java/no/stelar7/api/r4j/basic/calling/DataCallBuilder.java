@@ -635,7 +635,7 @@ public class DataCallBuilder
 				DataCall.getLimiter().get(dc.getPlatform()).forEach((key, value) ->
 				{
 					if(value.getCallCountInTime().entrySet().stream()
-						.anyMatch(e -> e.getValue().get() >= e.getKey().getPermits()))
+						.anyMatch(e -> e.getValue().get() >= e.getKey().getPermits() / 2))
 					{
 						valueList.append(key);
 						valueList.append("=");

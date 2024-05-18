@@ -42,13 +42,9 @@ public class BurstRateLimiter extends RateLimiter
 				logger.info("Ratelimited activated! Sleeping for: {}", dur);
 			}
 			
-			
 			Thread.sleep(sleepTime);
 		}
-		catch(InterruptedException e)
-		{
-			e.printStackTrace();
-		}
+		catch(InterruptedException ignored) {}
 		finally
 		{
 			lock.unlock();
@@ -88,7 +84,6 @@ public class BurstRateLimiter extends RateLimiter
 				long actualCallCount = callCountInTime.get(limit).get();
 				if(actualCallCount >= limit.getPermits())
 				{
-					
 					logger.debug("Calls made in the time frame: {}", actualCallCount);
 					logger.debug("Limit for the time frame: {}", limit.getPermits());
 					

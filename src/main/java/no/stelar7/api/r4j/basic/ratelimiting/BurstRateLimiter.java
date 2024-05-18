@@ -118,8 +118,7 @@ public class BurstRateLimiter extends RateLimiter
 			long untilNextInterval = nextIntervalFirstCall - now.toEpochMilli();
 			if(untilNextInterval <= 0)
 			{
-				long newFirstCall = -untilNextInterval < 5000 ? nextIntervalFirstCall : now.toEpochMilli();
-				firstCallInTime.get(limit).set(newFirstCall);
+				firstCallInTime.get(limit).set(now.toEpochMilli());
 				callCountInTime.get(limit).set(0);
 			}
 			

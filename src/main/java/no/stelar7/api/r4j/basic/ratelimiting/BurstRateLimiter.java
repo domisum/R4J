@@ -73,7 +73,7 @@ public class BurstRateLimiter extends RateLimiter
 		
 		for(var limit : limits)
 		{
-			var firstCall = firstCallInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
+			var firstCall = firstCallInTime.computeIfAbsent(limit, (key) -> new AtomicLong(now.toEpochMilli()));
 			var callCount = callCountInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
 			
 			long nextIntervalStart = firstCall.get() + limit.getTimeframeInMS();

@@ -36,9 +36,6 @@ public class BurstRateLimiter extends RateLimiter
 		{
 			update();
 			long sleepTime = getDelay();
-			if(sleepTime > 0)
-				sleepTime = 100;
-			
 			if(sleepTime != 0)
 			{
 				Duration dur = Duration.of(sleepTime, ChronoUnit.MILLIS);
@@ -81,46 +78,27 @@ public class BurstRateLimiter extends RateLimiter
 	
 	private long getDelay()
 	{
-		int bias = 1;
-		int multiplicativeBias = 1;
 		Instant now = Instant.now();
-		long[] delay = {overloadTimer * 1000L};
+		long delay = overloadTimer * 1000L;
 		overloadTimer = 0;
 		
-		if(delay[0] == 0)
-		{
+		if(delay == 0)
 			for(RateLimit limit : limits)
 			{
-				long actual = callCountInTime.get(limit).get();
-				if(actual >= limit.getPermits())
+				long actualCallCount = callCountInTime.get(limit).get();
+				if(actualCallCount >= limit.getPermits())
 				{
 					
-					logger.debug("Calls made in the time frame: {}", actual);
+					logger.debug("Calls made in the time frame: {}", actualCallCount);
 					logger.debug("Limit for the time frame: {}", limit.getPermits());
 					
-					int newBias = (int) Math.floorDiv(actual, (long) limit.getPermits());
-					if(newBias > multiplicativeBias)
-					{
-						multiplicativeBias = newBias;
-					}
-					
 					long newDelay = firstCallInTime.get(limit).get() + limit.getTimeframeInMS() - now.toEpochMilli();
-					if(newDelay > delay[0])
-					{
-						logger.info("Calls made in the time frame: {}", actual);
-						logger.info("Limit for the time frame: {}", limit.getPermits());
-						delay[0] = newDelay;
-					}
+					if(newDelay > delay)
+						delay = newDelay;
 				}
 			}
-		}
 		
-		if(delay[0] != 0)
-		{
-			delay[0] = (long) ((Math.ceil(delay[0] / 1000f) + bias) * (1000L * multiplicativeBias));
-		}
-		
-		return delay[0];
+		return delay + 50;
 	}
 	
 	private void update()

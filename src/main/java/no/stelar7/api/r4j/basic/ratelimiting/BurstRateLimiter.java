@@ -90,17 +90,18 @@ public class BurstRateLimiter extends RateLimiter
 				logger.debug("Limit for the time frame: {}", limit.getPermits());
 				
 				long newDelay = firstCallInTime.get(limit).get() + limit.getTimeframeInMS() - now.toEpochMilli();
-				if(newDelay >= 5000)
-					logger.warn("Long delay: {} ({})", newDelay, limit);
-				
 				newDelay += 50;
+				
+				if(newDelay > 10 * 1000)
+				{
+					logger.warn("Long delay: {} ({})", newDelay, limit);
+					newDelay = 10 * 1000;
+				}
+				
 				if(newDelay > delay)
 					delay = newDelay;
 			}
 		}
-		
-		if(delay > 10 * 1000)
-			delay = 10 * 1000;
 		
 		return delay;
 	}

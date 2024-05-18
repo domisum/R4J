@@ -36,7 +36,7 @@ public class BurstRateLimiter extends RateLimiter
 			var now = Instant.now();
 			update(now);
 			long sleepTime = getDelay(now);
-			if(sleepTime >= 0)
+			if(sleepTime > 0)
 			{
 				Duration dur = Duration.of(sleepTime, ChronoUnit.MILLIS);
 				logger.info("Rate limiting activated! Sleeping for: {}", dur);

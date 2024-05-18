@@ -81,22 +81,22 @@ public class BurstRateLimiter extends RateLimiter
 		long delay = overloadTimer * 1000L;
 		overloadTimer = 0;
 		
-		if(delay == 0)
-			for(RateLimit limit : limits)
+		for(RateLimit limit : limits)
+		{
+			long actualCallCount = callCountInTime.get(limit).get();
+			if(actualCallCount >= limit.getPermits())
 			{
-				long actualCallCount = callCountInTime.get(limit).get();
-				if(actualCallCount >= limit.getPermits())
-				{
-					logger.debug("Calls made in the time frame: {}", actualCallCount);
-					logger.debug("Limit for the time frame: {}", limit.getPermits());
-					
-					long newDelay = firstCallInTime.get(limit).get() + limit.getTimeframeInMS() - now.toEpochMilli();
-					if(newDelay > delay)
-						delay = newDelay;
-				}
+				logger.debug("Calls made in the time frame: {}", actualCallCount);
+				logger.debug("Limit for the time frame: {}", limit.getPermits());
+				
+				long newDelay = firstCallInTime.get(limit).get() + limit.getTimeframeInMS() - now.toEpochMilli();
+				newDelay += 50;
+				if(newDelay > delay)
+					delay = newDelay;
 			}
+		}
 		
-		return delay + 50;
+		return delay;
 	}
 	
 	private void update()

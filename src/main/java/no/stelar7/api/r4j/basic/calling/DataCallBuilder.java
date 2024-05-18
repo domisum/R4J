@@ -644,8 +644,7 @@ public class DataCallBuilder
 					}
 				});
 				
-				String reasonString = String.format("%s%n%s", limitType.getReason(), valueList.toString().trim());
-				String reason = String.format("%s%n", reasonString);
+				String reason = String.format("%s %s", limitType.getReason(), valueList.toString().trim());
 				
 				if(limitType == RateLimitType.LIMIT_METHOD)
 				{

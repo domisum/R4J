@@ -31,11 +31,10 @@ public class BurstRateLimiter extends RateLimiter
 		lock.lock();
 		try
 		{
-			long sleepTime;
-			while((sleepTime = getDelay()) > 0)
+			long sleepTime = getDelay();
+			if(sleepTime > 0)
 			{
 				logger.info("Rate limiting activated! Sleeping for: {}ms", sleepTime);
-				//noinspection BusyWait
 				Thread.sleep(sleepTime);
 			}
 		}

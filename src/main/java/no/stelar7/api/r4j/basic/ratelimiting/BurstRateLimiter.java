@@ -68,7 +68,7 @@ public class BurstRateLimiter extends RateLimiter
 		var now = Instant.now();
 		
 		if(overloadTimer > 0)
-			logger.warn("Overload timer set to {}", overloadTimer);
+			logger.info("Overload timer set to {}", overloadTimer);
 		long delay = overloadTimer * 1000L;
 		overloadTimer = 0;
 		
@@ -77,10 +77,11 @@ public class BurstRateLimiter extends RateLimiter
 			var firstCall = firstCallInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
 			var callCount = callCountInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
 			
-			long untilNextInterval = firstCall.get() - now.toEpochMilli() + limit.getTimeframeInMS();
+			long nextIntervalStart = firstCall.get() + limit.getTimeframeInMS();
+			long untilNextInterval = nextIntervalStart - now.toEpochMilli();
 			if(untilNextInterval <= 0)
 			{
-				firstCall.set(now.toEpochMilli());
+				firstCall.set(nextIntervalStart);
 				callCount.set(0);
 			}
 			if(untilNextInterval > 0 && callCount.get() >= limit.getPermits())

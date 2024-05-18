@@ -4,9 +4,7 @@ package no.stelar7.api.r4j.basic.ratelimiting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -20,7 +18,7 @@ public class BurstRateLimiter extends RateLimiter
 	
 	private static final Logger logger = LoggerFactory.getLogger(BurstRateLimiter.class);
 	
-	private ReentrantLock lock = new ReentrantLock();
+	private final ReentrantLock lock = new ReentrantLock();
 	
 	public BurstRateLimiter(List<RateLimit> limits)
 	{
@@ -33,13 +31,11 @@ public class BurstRateLimiter extends RateLimiter
 		lock.lock();
 		try
 		{
-			var now = Instant.now();
-			update(now);
-			long sleepTime = getDelay(now);
-			if(sleepTime > 0)
+			long sleepTime;
+			while((sleepTime = getDelay()) > 0)
 			{
-				Duration dur = Duration.of(sleepTime, ChronoUnit.MILLIS);
-				logger.info("Rate limiting activated! Sleeping for: {}", dur);
+				logger.info("Rate limiting activated! Sleeping for: {}ms", sleepTime);
+				//noinspection BusyWait
 				Thread.sleep(sleepTime);
 			}
 		}
@@ -67,8 +63,10 @@ public class BurstRateLimiter extends RateLimiter
 				}
 	}
 	
-	private long getDelay(Instant now)
+	private long getDelay()
 	{
+		var now = Instant.now();
+		
 		if(overloadTimer > 0)
 			logger.warn("Overload timer set to {}", overloadTimer);
 		long delay = overloadTimer * 1000L;
@@ -76,14 +74,18 @@ public class BurstRateLimiter extends RateLimiter
 		
 		for(var limit : limits)
 		{
-			long actualCallCount = callCountInTime.get(limit).get();
-			if(actualCallCount >= limit.getPermits())
+			var firstCall = firstCallInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
+			var callCount = callCountInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
+			
+			long untilNextInterval = firstCall.get() - now.toEpochMilli() + limit.getTimeframeInMS();
+			if(untilNextInterval <= 0)
 			{
-				logger.debug("Calls made in the time frame: {}", actualCallCount);
-				logger.debug("Limit for the time frame: {}", limit.getPermits());
-				
-				long newDelay = firstCallInTime.get(limit).get() - now.toEpochMilli() + limit.getTimeframeInMS();
-				newDelay += 500;
+				firstCall.set(now.toEpochMilli());
+				callCount.set(0);
+			}
+			if(untilNextInterval > 0 && callCount.get() >= limit.getPermits())
+			{
+				long newDelay = untilNextInterval + 500;
 				
 				if(newDelay > 10 * 1000)
 				{
@@ -94,27 +96,12 @@ public class BurstRateLimiter extends RateLimiter
 				if(newDelay > delay)
 					delay = newDelay;
 			}
-		}
-		
-		return delay;
-	}
-	
-	private void update(Instant now)
-	{
-		for(var limit : limits)
-		{
-			var firstCall = firstCallInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
-			var callCount = callCountInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
-			
-			if(firstCall.get() - now.toEpochMilli() + limit.getTimeframeInMS() <= 0)
-			{
-				firstCall.set(now.toEpochMilli());
-				callCount.set(0);
-			}
 			
 			callCount.incrementAndGet();
 			logger.debug("{}: current call count: {}", limit, callCount);
 		}
+		
+		return delay;
 	}
 	
 }

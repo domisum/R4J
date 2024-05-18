@@ -9,10 +9,10 @@ import no.stelar7.api.r4j.basic.exceptions.APIHTTPErrorReason;
 import no.stelar7.api.r4j.basic.exceptions.APINoValidResponseException;
 import no.stelar7.api.r4j.basic.exceptions.APIResponseException;
 import no.stelar7.api.r4j.basic.exceptions.APIUnsupportedActionException;
-import no.stelar7.api.r4j.basic.ratelimiting.BurstRateLimiter;
 import no.stelar7.api.r4j.basic.ratelimiting.RateLimit;
 import no.stelar7.api.r4j.basic.ratelimiting.RateLimitType;
 import no.stelar7.api.r4j.basic.ratelimiting.RateLimiter;
+import no.stelar7.api.r4j.basic.ratelimiting.TrickleRateLimiter;
 import no.stelar7.api.r4j.basic.utils.Pair;
 import no.stelar7.api.r4j.basic.utils.Utils;
 import org.slf4j.Logger;
@@ -495,7 +495,7 @@ public class DataCallBuilder
 			Map<RateLimit, AtomicLong> knownCount = Utils.getGson().fromJson(lastKey, new TypeToken<Map<RateLimit, AtomicLong>>() {}.getType());
 			
 			
-			RateLimiter newerLimit = new BurstRateLimiter(knownLimits);
+			var newerLimit = createLimiter(knownLimits);
 			newerLimit.setCallCountInTime(knownCount);
 			newerLimit.setFirstCallInTime(knownTime);
 			
@@ -737,15 +737,18 @@ public class DataCallBuilder
 	
 	public RateLimiter createLimiter(String limitCount)
 	{
-		Map<Integer, Integer> timeout = parseLimitFromHeader(limitCount);
+		var timeout = parseLimitFromHeader(limitCount);
 		
-		List<RateLimit> limits = new ArrayList<>();
-		for(Entry<Integer, Integer> entry : timeout.entrySet())
-		{
+		var limits = new ArrayList<RateLimit>();
+		for(var entry : timeout.entrySet())
 			limits.add(new RateLimit(entry.getValue(), entry.getKey(), TimeUnit.SECONDS));
-		}
 		
-		return new BurstRateLimiter(limits);
+		return createLimiter(limits);
+	}
+	
+	private static RateLimiter createLimiter(List<RateLimit> limits)
+	{
+		return new TrickleRateLimiter(limits);
 	}
 	
 	

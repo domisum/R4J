@@ -203,7 +203,7 @@ public class DataCallBuilder
 				}
 				else
 				{
-					logger.info("429 rate limit hit! {}", response.getResponseData());
+					logger.warn("429 rate limit hit! {}", response.getResponseData());
 				}
 				
 				return this.build();

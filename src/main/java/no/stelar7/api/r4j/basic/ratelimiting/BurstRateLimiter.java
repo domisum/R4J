@@ -90,7 +90,7 @@ public class BurstRateLimiter extends RateLimiter
 				logger.debug("Limit for the time frame: {}", limit.getPermits());
 				
 				long newDelay = firstCallInTime.get(limit).get() + limit.getTimeframeInMS() - now.toEpochMilli();
-				newDelay += 50;
+				newDelay += 500;
 				
 				if(newDelay > 10 * 1000)
 				{
@@ -112,11 +112,14 @@ public class BurstRateLimiter extends RateLimiter
 		for(RateLimit limit : limits)
 		{
 			AtomicLong firstCall = firstCallInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
-			AtomicLong counter = callCountInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
+			callCountInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
 			
-			if((firstCall.get() - now.toEpochMilli()) + limit.getTimeframeInMS() < 0)
+			long nextIntervalFirstCall = firstCall.get() + limit.getTimeframeInMS();
+			long untilNextInterval = nextIntervalFirstCall - now.toEpochMilli();
+			if(untilNextInterval <= 0)
 			{
-				firstCallInTime.get(limit).set(now.toEpochMilli());
+				long newFirstCall = -untilNextInterval < 5000 ? nextIntervalFirstCall : now.toEpochMilli();
+				firstCallInTime.get(limit).set(newFirstCall);
 				callCountInTime.get(limit).set(0);
 			}
 			

@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -34,15 +33,15 @@ public class BurstRateLimiter extends RateLimiter
 		lock.lock();
 		try
 		{
-			update();
-			long sleepTime = getDelay();
-			if(sleepTime != 0)
+			var now = Instant.now();
+			update(now);
+			long sleepTime = getDelay(now);
+			if(sleepTime >= 0)
 			{
 				Duration dur = Duration.of(sleepTime, ChronoUnit.MILLIS);
 				logger.info("Rate limiting activated! Sleeping for: {}", dur);
+				Thread.sleep(sleepTime);
 			}
-			
-			Thread.sleep(sleepTime);
 		}
 		catch(InterruptedException ignored) {}
 		finally
@@ -54,34 +53,28 @@ public class BurstRateLimiter extends RateLimiter
 	@Override
 	public void updatePermitsTakenPerX(Map<Integer, Integer> data)
 	{
-		for(Entry<Integer, Integer> key : data.entrySet())
-		{
-			for(RateLimit l : limits)
-			{
-				if(l.getTimeframeInMS() / 1000 == key.getKey())
+		for(var entry : data.entrySet())
+			for(var rateLimit : limits)
+				if(rateLimit.getTimeframeInMS() / 1000 == entry.getKey())
 				{
-					long oldVal = callCountInTime.get(l).get();
-					long newVal = key.getValue();
+					long oldVal = callCountInTime.get(rateLimit).get();
+					long newVal = entry.getValue();
 					if(oldVal + 1 < newVal)
 					{
-						callCountInTime.get(l).set(newVal);
-						logger.debug("limit {} has changed from {} to {}", key, oldVal, newVal);
+						callCountInTime.get(rateLimit).set(newVal);
+						logger.debug("limit {} has changed from {} to {}", entry, oldVal, newVal);
 					}
 				}
-			}
-		}
 	}
 	
-	private long getDelay()
+	private long getDelay(Instant now)
 	{
-		Instant now = Instant.now();
-		
 		if(overloadTimer > 0)
 			logger.warn("Overload timer set to {}", overloadTimer);
 		long delay = overloadTimer * 1000L;
 		overloadTimer = 0;
 		
-		for(RateLimit limit : limits)
+		for(var limit : limits)
 		{
 			long actualCallCount = callCountInTime.get(limit).get();
 			if(actualCallCount >= limit.getPermits())
@@ -89,7 +82,7 @@ public class BurstRateLimiter extends RateLimiter
 				logger.debug("Calls made in the time frame: {}", actualCallCount);
 				logger.debug("Limit for the time frame: {}", limit.getPermits());
 				
-				long newDelay = firstCallInTime.get(limit).get() + limit.getTimeframeInMS() - now.toEpochMilli();
+				long newDelay = firstCallInTime.get(limit).get() - now.toEpochMilli() + limit.getTimeframeInMS();
 				newDelay += 500;
 				
 				if(newDelay > 10 * 1000)
@@ -106,25 +99,21 @@ public class BurstRateLimiter extends RateLimiter
 		return delay;
 	}
 	
-	private void update()
+	private void update(Instant now)
 	{
-		Instant now = Instant.now();
-		for(RateLimit limit : limits)
+		for(var limit : limits)
 		{
-			AtomicLong firstCall = firstCallInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
-			callCountInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
+			var firstCall = firstCallInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
+			var callCount = callCountInTime.computeIfAbsent(limit, (key) -> new AtomicLong(0));
 			
-			long nextIntervalFirstCall = firstCall.get() + limit.getTimeframeInMS();
-			long untilNextInterval = nextIntervalFirstCall - now.toEpochMilli();
-			if(untilNextInterval <= 0)
+			if(firstCall.get() - now.toEpochMilli() + limit.getTimeframeInMS() <= 0)
 			{
-				firstCallInTime.get(limit).set(now.toEpochMilli());
-				callCountInTime.get(limit).set(0);
+				firstCall.set(now.toEpochMilli());
+				callCount.set(0);
 			}
 			
-			callCountInTime.get(limit).incrementAndGet();
-			
-			logger.debug("{}: current call count: {}", limit, callCountInTime.get(limit));
+			callCount.incrementAndGet();
+			logger.debug("{}: current call count: {}", limit, callCount);
 		}
 	}
 	

@@ -10,13 +10,31 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
+
+    <!-- DOMISUM START -->
+    <repositories>
+        <repository>
+            <id>repo-domisum-io</id>
+            <url>https://repo.domisum.io/repository/mvn/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>io.domisum.lib</groupId>
+            <artifactId>AuxiliumLib</artifactId>
+            <version>1.1.0-SNAPSHOT</version>
+        </dependency>
         <dependency> <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.32</version>
             <scope>provided</scope>
         </dependency>
+        <!-- DOMISUM END -->
 
         <!-- JSON to POJO decoding -->
         <dependency>

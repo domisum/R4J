@@ -12,7 +12,7 @@ import no.stelar7.api.r4j.basic.exceptions.APIUnsupportedActionException;
 import no.stelar7.api.r4j.basic.ratelimiting.RateLimit;
 import no.stelar7.api.r4j.basic.ratelimiting.RateLimitType;
 import no.stelar7.api.r4j.basic.ratelimiting.RateLimiter;
-import no.stelar7.api.r4j.basic.ratelimiting.TrickleRateLimiter;
+import no.stelar7.api.r4j.basic.ratelimiting.TrickleMultiRateLimiter;
 import no.stelar7.api.r4j.basic.utils.Pair;
 import no.stelar7.api.r4j.basic.utils.Utils;
 import org.slf4j.Logger;
@@ -748,7 +748,7 @@ public class DataCallBuilder
 	
 	private static RateLimiter createLimiter(List<RateLimit> limits)
 	{
-		return new TrickleRateLimiter(limits);
+		return new TrickleMultiRateLimiter(limits);
 	}
 	
 	

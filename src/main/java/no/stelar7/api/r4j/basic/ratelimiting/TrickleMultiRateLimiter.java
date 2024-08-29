@@ -58,9 +58,7 @@ public class TrickleMultiRateLimiter extends RateLimiter
 	
 	private TrickleRateLimiter initRateLimiter(RateLimit rateLimit)
 	{
-		double perSecond = rateLimit.getPermits() * 1000d / rateLimit.getTimeframeInMS() * 0.95;
-		double maxAccumulation = rateLimit.getPermits() / 2d;
-		return TrickleRateLimiter.perSecondAndAccLimit(perSecond, maxAccumulation);
+		return new TrickleRateLimiter(rateLimit.getPermits(), rateLimit.getTimeframe(), 0.1);
 	}
 	
 }

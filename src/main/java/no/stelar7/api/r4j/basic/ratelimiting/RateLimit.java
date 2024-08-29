@@ -1,5 +1,6 @@
 package no.stelar7.api.r4j.basic.ratelimiting;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 public class RateLimit
@@ -21,6 +22,11 @@ public class RateLimit
     public long getTimeframeInMS()
     {
         return delayInMs;
+    }
+    
+    public Duration getTimeframe()
+    {
+        return Duration.ofMillis(getTimeframeInMS());
     }
     
     @Override

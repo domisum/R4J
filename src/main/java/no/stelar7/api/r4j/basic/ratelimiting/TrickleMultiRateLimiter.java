@@ -1,7 +1,7 @@
 package no.stelar7.api.r4j.basic.ratelimiting;
 
 
-import io.domisum.lib.auxiliumlib.TrickleRateLimiter;
+import io.domisum.lib.auxiliumlib.time.ratelimit.TrickleRateLimiter;
 
 import java.util.HashMap;
 import java.util.List;

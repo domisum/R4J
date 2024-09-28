@@ -58,7 +58,7 @@ public class TrickleMultiRateLimiter extends RateLimiter
 	
 	private TrickleRateLimiter initRateLimiter(RateLimit rateLimit)
 	{
-		return new TrickleRateLimiter(rateLimit.getPermits(), rateLimit.getTimeframe(), 0.1);
+		return new TrickleRateLimiter(rateLimit.getPermits(), rateLimit.getTimeframe(), rateLimit.getPermits() * 0.1);
 	}
 	
 }

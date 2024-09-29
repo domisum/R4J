@@ -24,7 +24,7 @@ public class FileSystemCacheProvider implements CacheProvider
     private final ScheduledExecutorService clearService = Executors.newScheduledThreadPool(1);
     private       ScheduledFuture<?>       clearTask;
     
-    public FileSystemCacheProvider(Path pathToFiles, int ttl)
+    public FileSystemCacheProvider(Path pathToFiles, long ttl)
     {
         setTimeToLiveGlobal(ttl);
         home = pathToFiles != null ? pathToFiles : Paths.get(".", "l4j8cache").normalize();

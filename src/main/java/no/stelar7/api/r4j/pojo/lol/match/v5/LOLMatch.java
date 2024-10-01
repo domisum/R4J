@@ -179,7 +179,6 @@ public class LOLMatch implements Serializable
                ", gameType=" + gameType +
                ", gameVersion='" + gameVersion + '\'' +
                ", mapId=" + mapId +
-               ", participants=" + participants +
                ", platformId=" + platformId +
                ", queueId=" + queueId +
                ", teams=" + teams +

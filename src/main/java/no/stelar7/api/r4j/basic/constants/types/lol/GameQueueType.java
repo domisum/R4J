@@ -284,6 +284,10 @@ public enum GameQueueType implements CodedEnum
      */
     ODYSSEY_ONSLAUGHT(1070, 1071),
     /**
+     * Swarm
+     */
+    STRAWBERRY(1810, 1820, 1830, 1840),
+    /**
      * Tutorial games
      */
     TUTORIAL_MODULE_1(2000),
@@ -342,9 +346,15 @@ public enum GameQueueType implements CodedEnum
     
     TEAMFIGHT_TACTICS_SOUL_BRAWL(1180, 1181, 1182, 1185),
     
-    TEAMFIGHT_TACTICS_CHONCC_TREASURE(1190, 1191, 1192, 1195),
+    TEAMFIGHT_TACTICS_CHONCC_TREASURE(1190, 1191, 1192, 1195, 1210),
+    
+    TEAMFIGHT_TACTICS_TOCKER_S_TRIALS(1220),
+    
+    TEAMFIGHT_TACTICS_PENGU_S_PARTY(6120, 6121, 6122, 6125),
     
     TEAMFIGHT_TACTICS_SET3_5_REVIVAL_GALAXIES(6000, 6001, 6002, 6005),
+    
+    TEAMFIGHT_TACTICS_REVIVAL_DAWN_OF_HEROES(6110, 6111, 6112, 6115),
     
     TEAMFIGHT_TACTICS_SET_QUEUE_1(6010, 6040, 6070),
     TEAMFIGHT_TACTICS_SET_QUEUE_2(6020, 6050, 6080),
@@ -394,6 +404,8 @@ public enum GameQueueType implements CodedEnum
     ARAM_BOTS(860),
     
     QUICKPLAY_NORMAL(490),
+    
+    SWIFTPLAY(480)
     ;
     
     private final Integer[] codes;

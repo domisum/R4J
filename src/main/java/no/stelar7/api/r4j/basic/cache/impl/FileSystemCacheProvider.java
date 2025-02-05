@@ -1,18 +1,29 @@
 package no.stelar7.api.r4j.basic.cache.impl;
 
 import io.domisum.lib.auxiliumlib.util.ThreadUtil;
-import no.stelar7.api.r4j.basic.cache.*;
+import no.stelar7.api.r4j.basic.cache.CacheLifetimeHint;
+import no.stelar7.api.r4j.basic.cache.CacheProvider;
 import no.stelar7.api.r4j.basic.calling.DataCall;
 import no.stelar7.api.r4j.basic.constants.api.URLEndpoint;
 import no.stelar7.api.r4j.basic.utils.Utils;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.file.*;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
-import java.time.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class FileSystemCacheProvider implements CacheProvider
 {
@@ -55,7 +66,8 @@ public class FileSystemCacheProvider implements CacheProvider
 		
 		if(timeToLive > 0)
 		{
-			clearTask = clearService.scheduleAtFixedRate(this::clearOldCache, timeToLive, timeToLive, TimeUnit.MILLISECONDS);
+			long initialDelay = Math.min(Duration.ofMinutes(10).toMillis(), timeToLive);
+			clearTask = clearService.scheduleAtFixedRate(this::clearOldCache, initialDelay, timeToLive, TimeUnit.MILLISECONDS);
 		}
 		else if(timeToLive == CacheProvider.TTL_INFINITY)
 		{

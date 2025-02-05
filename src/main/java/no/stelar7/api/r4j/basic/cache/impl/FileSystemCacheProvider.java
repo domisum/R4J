@@ -296,10 +296,11 @@ public class FileSystemCacheProvider implements CacheProvider
 			if(timeToLive < life)
 			{
 				// no point in deleting the folders..
-				if(Files.isDirectory(p))
-				{
-					return;
-				}
+				// I DISAGREE! delete them anyway to clean up
+//				if(Files.isDirectory(p))
+//				{
+//					return;
+//				}
 				
 				logger.debug("Data in cache is outdated, deleting...");
 				Files.deleteIfExists(p);

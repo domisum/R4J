@@ -6,6 +6,8 @@ public interface CodedEnum<T>
 {
     Optional<T> getFromCode(final String type);
     
+    String name();
+    
     String prettyName();
     
     default String commonName()

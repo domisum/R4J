@@ -20,6 +20,12 @@ public class GenericEnumSerializer<T> implements JsonDeserializer<T>
                                       .map(Optional::get)
                                       .findFirst();
         
-        return retu.map(o -> (T) o).orElseThrow(() -> new APIEnumNotUpToDateException(t, json));
+        return retu.map(o -> (T) o)
+            .or(() ->
+				values.stream()
+				.filter(v -> v.name().equals("UNKNOWN"))
+				.map(v->(T) v)
+				.findFirst()
+			).orElseThrow(() -> new APIEnumNotUpToDateException(t, json));
     }
 }

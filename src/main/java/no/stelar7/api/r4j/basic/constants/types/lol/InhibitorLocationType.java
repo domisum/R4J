@@ -1,11 +1,10 @@
 package no.stelar7.api.r4j.basic.constants.types.lol;
 
-import no.stelar7.api.r4j.basic.constants.types.CodedEnum;
 import no.stelar7.api.r4j.basic.utils.Pair;
 
 import java.util.*;
 
-public final class InhibitorLocationType implements CodedEnum
+public final class InhibitorLocationType
 {
     private InhibitorLocationType()
     {
@@ -51,17 +50,5 @@ public final class InhibitorLocationType implements CodedEnum
         inhibs.getOrDefault(map, new HashMap<>()).forEach((k, v) -> v.forEach((k2, v2) -> retTowers.add(v2)));
         
         return retTowers;
-    }
-    
-    @Override
-    public Optional getFromCode(String type)
-    {
-        return Optional.empty();
-    }
-    
-    @Override
-    public String prettyName()
-    {
-        return null;
     }
 }

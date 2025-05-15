@@ -1,11 +1,10 @@
 package no.stelar7.api.r4j.basic.constants.types.lol;
 
-import no.stelar7.api.r4j.basic.constants.types.CodedEnum;
 import no.stelar7.api.r4j.basic.utils.Pair;
 
 import java.util.*;
 
-public final class TowerLocationType implements CodedEnum
+public final class TowerLocationType
 {
     private TowerLocationType()
     {
@@ -97,17 +96,5 @@ public final class TowerLocationType implements CodedEnum
         towers.getOrDefault(map, new HashMap<>()).forEach((k, v) -> v.forEach((k1, v1) -> v1.forEach((k2, v2) -> retTowers.add(v2))));
         
         return retTowers;
-    }
-    
-    @Override
-    public Optional<TowerLocationType> getFromCode(String type)
-    {
-        return Optional.empty();
-    }
-    
-    @Override
-    public String prettyName()
-    {
-        return null;
     }
 }

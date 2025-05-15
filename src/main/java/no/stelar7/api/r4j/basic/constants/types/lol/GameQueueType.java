@@ -216,6 +216,10 @@ public enum GameQueueType implements CodedEnum
      */
     CLASH(700, 701, 721),
     /**
+     * AR Ultra Rapid Fire Clash
+     */
+    ARURF_CLASH(740, 741),
+    /**
      * BOT 3x3 games
      */
     BOT_3X3_INTERMEDIATE(800, 801),
@@ -355,6 +359,8 @@ public enum GameQueueType implements CodedEnum
     TEAMFIGHT_TACTICS_SET3_5_REVIVAL_GALAXIES(6000, 6001, 6002, 6005),
     
     TEAMFIGHT_TACTICS_REVIVAL_DAWN_OF_HEROES(6110, 6111, 6112, 6115),
+    
+    TEAMFIGHT_TACTICS_REVIVAL_FESTIVAL_OF_BEASTS(6100, 6101, 6102, 6105),
     
     TEAMFIGHT_TACTICS_SET_QUEUE_1(6010, 6040, 6070),
     TEAMFIGHT_TACTICS_SET_QUEUE_2(6020, 6050, 6080),
@@ -553,6 +559,8 @@ public enum GameQueueType implements CodedEnum
                 return "Darkstar";
             case CLASH:
                 return "Clash";
+              case ARURF_CLASH:
+                return "ARURF Clash";
             case BOT_3X3_INTERMEDIATE:
                 return "3v3 Bots Intermediate Difficulty";
             case BOT_3X3_INTRO:

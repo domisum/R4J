@@ -7,6 +7,9 @@ import java.util.stream.Stream;
 
 public enum GameQueueType implements CodedEnum
 {
+    
+    UNKNOWN(-1),
+    
     /**
      * Custom games
      */

@@ -190,12 +190,7 @@ public class DataCallBuilder
                     return sleepAndRetry(retrys, response.getResponseCode());
                 } else
                 {
-                    String error = response.getResponseData() + "429 ratelimit hit! " +
-                                   "Please do not restart your application to refresh the timer! " +
-                                   "This isn't supposed to happen unless you restarted your app before the last limit was hit!";
-                    
-                    logger.error(error);
-                    
+                    logger.warn("429 rate limit hit! {}", response.getResponseData());
                 }
                 
                 return this.build();
@@ -616,8 +611,7 @@ public class DataCallBuilder
                     }
                 });
                 
-                String reasonString = String.format("%s%n%s", limitType.getReason(), valueList.toString().trim());
-                String reason       = String.format("%s%n", reasonString);
+                String reason = String.format("%s %s", limitType.getReason(), valueList.toString().trim());
                 
                 if (limitType == RateLimitType.LIMIT_METHOD)
                 {

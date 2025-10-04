@@ -254,7 +254,10 @@ public class FileSystemCacheProvider implements CacheProvider
 				return;
 			}
 			
-			Files.walk(pathToWalk).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+			try(var stream = Files.walk(pathToWalk))
+			{
+				stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+			}
 		}
 		catch(IOException e)
 		{
@@ -301,11 +304,14 @@ public class FileSystemCacheProvider implements CacheProvider
 		
 		if(Files.isDirectory(p))
 		{
-			boolean isDirectoryEmpty = Files.walk(p).skip(1).findAny().isEmpty();
-			if(isDirectoryEmpty)
+			try(var stream = Files.walk(p))
 			{
-				Files.deleteIfExists(p);
-				return;
+				boolean isDirectoryEmpty = stream.skip(1).findAny().isEmpty();
+				if(isDirectoryEmpty)
+				{
+					Files.deleteIfExists(p);
+					return;
+				}
 			}
 		}
 		
@@ -373,7 +379,10 @@ public class FileSystemCacheProvider implements CacheProvider
 				pathToWalk = pathToWalk.resolve(Utils.normalizeString(o.toString()));
 			}
 			
-			return Files.walk(pathToWalk).filter(p -> !Files.isDirectory(p)).count();
+			try(var stream = Files.walk(pathToWalk))
+			{
+				return stream.filter(p -> !Files.isDirectory(p)).count();
+			}
 		}
 		catch(IOException e)
 		{

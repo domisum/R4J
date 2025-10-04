@@ -269,9 +269,9 @@ public class FileSystemCacheProvider implements CacheProvider
 			return;
 		}
 		
-		try
+		try(var stream = Files.walk(home))
 		{
-			Files.walk(home).sorted(Comparator.reverseOrder()).forEach(p ->
+			stream.sorted(Comparator.reverseOrder()).forEach(p ->
 			{
 				try
 				{
@@ -296,6 +296,16 @@ public class FileSystemCacheProvider implements CacheProvider
 		if(!Files.exists(p) || p.equals(home))
 		{
 			return;
+		}
+		
+		if(Files.isDirectory(p))
+		{
+			boolean isDirectoryEmpty = Files.walk(p).skip(1).findAny().isEmpty();
+			if(isDirectoryEmpty)
+			{
+				Files.deleteIfExists(p);
+				return;
+			}
 		}
 		
 		LocalDateTime accessTime = ((FileTime) Files.readAttributes(p, "lastAccessTime").get("lastAccessTime")).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();

@@ -604,11 +604,16 @@ public class DataCallBuilder
                 final RateLimitType limitType = RateLimitType.getBestMatch(con.getHeaderField("X-Rate-Limit-Type"));
                 
                 StringBuilder valueList = new StringBuilder();
-                DataCall.getLimiter().get(dc.getPlatform()).forEach((key, value) -> {
-                    valueList.append(key);
-                    valueList.append("=");
-                    valueList.append(value.getCallCountInTime());
-                    valueList.append("\n");
+                DataCall.getLimiter().get(dc.getPlatform()).forEach((key, value) ->
+                {
+                    if(value.getCallCountInTime().entrySet().stream()
+                        .anyMatch(e -> e.getValue().get() >= e.getKey().getPermits() / 2))
+                    {
+                        valueList.append(key);
+                        valueList.append("=");
+                        valueList.append(value.getCallCountInTime());
+                        valueList.append(" ");
+                    }
                 });
                 
                 String reasonString = String.format("%s%n%s", limitType.getReason(), valueList.toString().trim());

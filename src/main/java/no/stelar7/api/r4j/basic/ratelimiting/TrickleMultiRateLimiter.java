@@ -44,6 +44,12 @@ public class TrickleMultiRateLimiter extends RateLimiter
 	@Override
 	public void updatePermitsTakenPerX(Map<Integer, Integer> data) {}
 	
+	@Override
+	public void resetCalls()
+	{
+		// not relevant for this implementation
+	}
+	
 	
 	// INTERNAL
 	private long getDelay()

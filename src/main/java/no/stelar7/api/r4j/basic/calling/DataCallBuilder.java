@@ -294,12 +294,12 @@ public class DataCallBuilder
         for (String key : new HashSet<>(parent.keySet()))
         {
             JsonObject child = parent.getAsJsonObject(key);
-            try 
+            try
             {
                 int keyAsInt = Integer.parseInt(key);
                 child.addProperty("id", keyAsInt);
                 
-            }   catch(NumberFormatException e) 
+            }   catch(NumberFormatException e)
             {
                 parent.remove(key);
                 logger.warn("Item/Rune received without a valid Id ({}), item removed from the list", key);
@@ -601,14 +601,10 @@ public class DataCallBuilder
                 StringBuilder valueList = new StringBuilder();
                 DataCall.getLimiter().get(dc.getPlatform()).forEach((key, value) ->
                 {
-                    if(value.getCallCountInTime().entrySet().stream()
-                        .anyMatch(e -> e.getValue().get() >= e.getKey().getPermits() / 2))
-                    {
-                        valueList.append(key);
-                        valueList.append("=");
-                        valueList.append(value.getCallCountInTime());
-                        valueList.append(" ");
-                    }
+					valueList.append(key);
+                    valueList.append("=");
+					valueList.append(value.getCallCountInTime());
+					valueList.append(" ");
                 });
                 
                 String reason = String.format("%s %s", limitType.getReason(), valueList.toString().trim());

@@ -66,8 +66,9 @@ public class FileSystemCacheProvider implements CacheProvider
 		
 		if(timeToLive > 0)
 		{
-			long initialDelay = Math.min(Duration.ofMinutes(10).toMillis(), timeToLive);
-			clearTask = clearService.scheduleAtFixedRate(this::clearOldCache, initialDelay, timeToLive, TimeUnit.MILLISECONDS);
+			long initialDelayMs = Math.min(timeToLive, Duration.ofMinutes(10).toMillis());
+			long intervalMs = Math.min(timeToLive, Duration.ofHours(1).toMillis());
+			clearTask = clearService.scheduleAtFixedRate(this::clearOldCache, initialDelayMs, intervalMs, TimeUnit.MILLISECONDS);
 		}
 		else if(timeToLive == CacheProvider.TTL_INFINITY)
 		{

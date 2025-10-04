@@ -17,8 +17,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -315,14 +313,13 @@ public class FileSystemCacheProvider implements CacheProvider
 			}
 		}
 		
-		LocalDateTime accessTime = ((FileTime) Files.readAttributes(p, "lastAccessTime").get("lastAccessTime")).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-		LocalDateTime nowTime = LocalDateTime.now();
-		long life = Duration.between(accessTime, nowTime).getSeconds() * 1000;
+		var lifeTime = ((FileTime) Files.getAttribute(p, "lastModifiedTime")).toInstant();
+		var nowTime = Instant.now();
+		long lifeMs = Duration.between(lifeTime, nowTime).getSeconds() * 1000;
 		
 		if(timeToLive != CacheProvider.TTL_USE_HINTS)
 		{
-			
-			if(timeToLive < life)
+			if(timeToLive < lifeMs)
 			{
 				// no point in deleting the folders..
 				// I DISAGREE! delete them anyway to clean up
@@ -346,7 +343,7 @@ public class FileSystemCacheProvider implements CacheProvider
 			URLEndpoint endpoint = URLEndpoint.valueOf(folder.getFileName().toString());
 			long expectedLife = hints.get(endpoint);
 			
-			if(expectedLife < life)
+			if(expectedLife < lifeMs)
 			{
 				// no point in deleting the folders..
 				if(Files.isDirectory(p))

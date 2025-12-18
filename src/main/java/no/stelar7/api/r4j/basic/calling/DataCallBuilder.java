@@ -237,12 +237,23 @@ public class DataCallBuilder
             {
                 break;
             }
-        }
+            }
         
-        System.err.println("UNHANDLED RESPONSE CODE!!!");
-        System.err.println("Response Code:" + response.getResponseCode());
-        System.err.println("Response Data:" + response.getResponseData());
-        throw new APINoValidResponseException(response.getResponseData());
+            System.err.println("UNHANDLED RESPONSE CODE!!!");
+            System.err.println("Response Code:" + response.getResponseCode());
+            System.err.println("Response Data:" + response.getResponseData());
+            throw new APINoValidResponseException(response.getResponseData());
+        } catch (InterruptedException e)
+        {
+            logger.error("Semaphore was interrupted while trying to acquire a permit for the API call: {}", url, e);
+            Thread.currentThread().interrupt();
+            return null;
+        } finally
+        {
+            if(numberOfCallsAllowedInParallel > 0) {
+                getSemaphore(keyTypeUsed, platform).release();
+            }
+        }
     }
     
     private String postProcess(String returnValue)

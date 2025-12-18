@@ -2,7 +2,10 @@ package no.stelar7.api.r4j.basic.ratelimiting;
 
 
 import io.domisum.lib.auxiliumlib.time.ratelimit.TrickleRateLimiter;
+import no.stelar7.api.r4j.basic.constants.types.ApiKeyType;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +28,7 @@ public class TrickleMultiRateLimiter extends RateLimiter
 	
 	// INTERFACE
 	@Override
-	public void acquire()
+	public Instant acquire(ApiKeyType keyType, Enum platformOrEndpoint)
 	{
 		lock.lock();
 		try
@@ -39,10 +42,11 @@ public class TrickleMultiRateLimiter extends RateLimiter
 		{
 			lock.unlock();
 		}
+		return Instant.now().plus(Duration.ofSeconds(30));
 	}
 	
 	@Override
-	public void updatePermitsTakenPerX(Map<Integer, Integer> data) {}
+	public void updatePermitsTakenPerX(Map<Integer, Integer> data, ApiKeyType keyTypeUsed, Enum platformOrEndpoint) {}
 	
 	@Override
 	public void resetCalls()
